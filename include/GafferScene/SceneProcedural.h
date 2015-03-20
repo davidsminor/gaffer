@@ -76,7 +76,18 @@ class SceneProcedural : public IECore::Renderer::Procedural
 		virtual IECore::MurmurHash hash() const;
 		virtual Imath::Box3f bound() const;
 		virtual void render( IECore::Renderer *renderer ) const;
-		
+
+		class SceneGraph;
+		static void outputGeometry(
+			IECore::Renderer* renderer,
+			const ScenePlug* scenePlug,
+			const Gaffer::Context* context,
+			SceneGraph* sceneGraph,
+			bool transformBlur,
+			bool deformationBlur,
+			Imath::V2f shutter,
+			bool update = false );
+
 		typedef boost::signal<void ( void )> AllRenderedSignal;
 		
 		/// A signal emitted when all pending SceneProcedurals have been rendered or destroyed
@@ -142,7 +153,15 @@ class SceneProcedural : public IECore::Renderer::Procedural
 		
 		static tbb::mutex g_allRenderedMutex;
 		static AllRenderedSignal g_allRenderedSignal;
-		
+
+		// tbb classes for performing multithreaded traversals of the scene graph, etc.
+		class SceneGraphBuildTask;
+		class ChildNamesUpdateTask;
+
+		class SceneGraphIteratorFilter;
+		class SceneGraphEvaluatorFilter;
+		class SceneGraphOutputFilter;
+
 };
 
 IE_CORE_DECLAREPTR( SceneProcedural );
